@@ -42,6 +42,14 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
     private Sales_Invoice_Gen_Frame frame ;
     private New_Line_Dialog new_Line_Dialog ;
     private New_Invoice_Dialog new_Invoice_Dialog ;
+    
+    // to save the last selected invoice in case of deletion or creation of line
+    private int selectedInvoice  ;
+    /*
+    - If user didnt select a new invoice , then it is the previous invoice (True)
+    - If user select a new invoice , then the selected invoice would be changed from the previous one (False)
+    */
+    private boolean Is_The_Same_Invoice = false ;
 
 
     public Sales_Invoice_Controller(Sales_Invoice_Gen_Frame frame) {
@@ -56,13 +64,21 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
         
         // get the row number of the selected invoice 
         int selsctedInvoice = frame.getInvoicesTable().getSelectedRow();
+        int selectedLine = frame.getLinesTable().getSelectedRow();
         
+//        if(selsctedInvoice != -1 && selectedLine != -1)
+//        {
+//           
+//        }
+        
+ 
         /* check if user selected an invoice
         - selectedInvoice == -1 -> user has not selected an invoice from the table
         - any positive number -> the user has selected an invoice
         */ 
         if(selsctedInvoice != -1)
         {
+            Is_The_Same_Invoice = false ;
             // get the selected invoice from the array of invoices
             Invoice currentInvoice = frame.getInvoices().get(selsctedInvoice);
             
@@ -219,6 +235,8 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
                 frame.getInvoicesTable().setModel(invoice_Table_Model);
                 // inform the table that data has been changed to rediplay the invoice table
                 frame.getInvoice_Table_Model().fireTableDataChanged();
+                
+                displayInvoices();
              
             }
         }    catch (NumberFormatException ex) {
@@ -337,6 +355,8 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
         
         // Display a message to inform the user that the new invoice has been created successfully
         JOptionPane.showMessageDialog(frame, "Invoice Created Successfully", "Attention", JOptionPane.INFORMATION_MESSAGE);
+        
+        displayInvoices();
     }
 
     // if user pressed Cancel button then stop the opertaion of creation of invoice and destroy the dialog
@@ -378,6 +398,8 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
             
         // display a message tells the user thst new invoice has been removed successfully
         JOptionPane.showMessageDialog(frame, "Invoice Removed Successfully", "Attention", JOptionPane.INFORMATION_MESSAGE);
+        
+        displayInvoices();
         }
     }
     
@@ -391,11 +413,17 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
         // Display the dialog
         new_Line_Dialog.setVisible(true);
     }
+    
+
  
     private void createLineOk() {
         
+        if(Is_The_Same_Invoice == false)
+        {
         // Get the row number of selected invoice
-        int selectedInvoice = frame.getInvoicesTable().getSelectedRow();
+         selectedInvoice = frame.getInvoicesTable().getSelectedRow();
+         Is_The_Same_Invoice = true ;
+        }
         
         // Get the enterd line item name of the line
         String name = new_Line_Dialog.getLineItemNameField().getText();
@@ -427,11 +455,14 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
                    
             // display a message tells the user thst new line has been created successfully
             JOptionPane.showMessageDialog(frame, "Line Created Successfully", "Attention", JOptionPane.INFORMATION_MESSAGE);
+            
+            displayInvoices();
         }
             // destroy line dialog   
             new_Line_Dialog.setVisible(false);
             new_Line_Dialog.dispose();
             new_Line_Dialog = null ;
+            
 
     }
 
@@ -448,17 +479,25 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
         
         // Get the row number of selected line
         int selectedLine = frame.getLinesTable().getSelectedRow();
+        
+        // if user selected a new invoice
+        if(Is_The_Same_Invoice == false)
+        {
         // Get the row number of selected invoice
-        int selectedInvoice = frame.getInvoicesTable().getSelectedRow();
+         selectedInvoice = frame.getInvoicesTable().getSelectedRow();
+         // raise a flag that there is a selected invoice until user select a new one
+         Is_The_Same_Invoice = true ;
+        }
         
         /* check if user selected an invoice and line
         - selectedInvoice == -1 -> user has not selected an invoice and line from the tablea
         - any positive number -> the user has selected an invoice and line
         */
-        if(selectedLine != -1 && selectedInvoice != -1)
+        if(selectedLine != -1 )
         {
-            // Get the selected invoice
-            Invoice invoice = frame.getInvoices().get(selectedInvoice) ;
+            // Get the selected line
+
+            Line line  = frame.getLine_Table_Model().getLines().get(selectedLine);
             
             // Remove the selected line from the line table model
             frame.getLine_Table_Model().getLines().remove(selectedLine);
@@ -468,13 +507,21 @@ public class Sales_Invoice_Controller implements ActionListener , ListSelectionL
             // Inform the invoice table model that data has been changed
             frame.getInvoice_Table_Model().fireTableDataChanged();
             // get the new total of invoice after removing the new line from it
-            frame.getInvoiceTotalJlable().setText(""+invoice.getTotalInvoice());
+            frame.getInvoiceTotalJlable().setText(""+line.getInvoiceOfLine().getTotalInvoice());
             
         // display a message tells the user thst new line has been removed successfully
         JOptionPane.showMessageDialog(frame, "Line Removed Successfully", "Attention", JOptionPane.INFORMATION_MESSAGE);
+        
+        displayInvoices();
             
         }
     }
+    
+    private void displayInvoices(){
+         for (Invoice header :frame.getInvoices()) {
+             System.out.println(header);
+         }
+     }
 
    
 }

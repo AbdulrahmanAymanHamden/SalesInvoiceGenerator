@@ -108,6 +108,6 @@ public class Invoice {
     
     @Override
     public String toString() {
-        return "Invoice{" + "number=" + invoiceNumber + ", Customer=" + Client + ", Date=" + invoiceDate + ", Lines=" + invoiceLines + '}';
+        return "\nInvoice{" + "number=" + invoiceNumber + ", Customer=" + Client + ", Date=" + invoiceDate + ", Lines=" + invoiceLines + '}';
     }
 }

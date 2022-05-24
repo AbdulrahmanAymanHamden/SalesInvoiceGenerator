@@ -87,7 +87,7 @@ public class Line {
     
     @Override
     public String toString() {
-        return "Line{" + "Num=" + invoiceOfLine.getInvoiceNumber() + ", item=" + lineItemName + ", Price=" + lineItemPrice + ", count=" + lineItemCount + '}';
+        return "\nLine{" + "Num=" + invoiceOfLine.getInvoiceNumber() + ", item=" + lineItemName + ", Price=" + lineItemPrice + ", count=" + lineItemCount + '}';
     }
     
 }
